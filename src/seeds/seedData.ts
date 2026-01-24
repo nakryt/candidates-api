@@ -1,0 +1,90 @@
+import { CandidateStatus } from "../entities/Candidate";
+
+export const skillsData = [
+  "JavaScript",
+  "TypeScript",
+  "React",
+  "Node.js",
+  "Python",
+  "PostgreSQL",
+  "Docker",
+  "AWS",
+  "Git",
+];
+
+export const candidatesData = [
+  {
+    name: "John Doe",
+    position: "Frontend Developer",
+    status: CandidateStatus.ACTIVE,
+    email: "john.doe@example.com",
+    phone: "+1234567890",
+    description:
+      "Experienced frontend developer with a passion for React and TypeScript.",
+    skills: ["JavaScript", "TypeScript", "React"],
+  },
+  {
+    name: "Jane Smith",
+    position: "Backend Developer",
+    status: CandidateStatus.INTERVIEW,
+    email: "jane.smith@example.com",
+    phone: "+1987654321",
+    description: "Backend engineer specializing in Node.js and PostgreSQL.",
+    skills: ["Node.js", "PostgreSQL", "Docker"],
+  },
+  {
+    name: "Mike Johnson",
+    position: "Fullstack Developer",
+    status: CandidateStatus.ACTIVE,
+    email: "mike.j@example.com",
+    phone: "+1122334455",
+    description:
+      "Versatile developer comfortable with both frontend and backend technologies.",
+    skills: ["React", "Node.js", "TypeScript", "Git"],
+  },
+  {
+    name: "Sarah Williams",
+    position: "DevOps Engineer",
+    status: CandidateStatus.REJECTED,
+    email: "sarah.w@example.com",
+    phone: "+1555666777",
+    description: "Expert in cloud infrastructure and CI/CD pipelines.",
+    skills: ["Docker", "AWS", "Git"],
+  },
+  {
+    name: "Alex Brown",
+    position: "Python Developer",
+    status: CandidateStatus.ACTIVE,
+    email: "alex.b@example.com",
+    phone: "+1444333222",
+    description: "Data-focused developer with strong Python and SQL skills.",
+    skills: ["Python", "PostgreSQL", "Git"],
+  },
+  {
+    name: "Emily Davis",
+    position: "UI/UX Designer",
+    status: CandidateStatus.INTERVIEW,
+    email: "emily.d@example.com",
+    phone: "+1777888999",
+    description: "Creative designer with a background in frontend development.",
+    skills: ["React", "JavaScript"],
+  },
+  {
+    name: "Chris Wilson",
+    position: "Software Architect",
+    status: CandidateStatus.ACTIVE,
+    email: "chris.w@example.com",
+    phone: "+1000111222",
+    description: "Strategic thinker with deep knowledge of system design.",
+    skills: ["Node.js", "AWS", "Docker", "TypeScript"],
+  },
+  {
+    name: "Lisa Anderson",
+    position: "QA Engineer",
+    status: CandidateStatus.ACTIVE,
+    email: "lisa.a@example.com",
+    phone: "+1999888777",
+    description: "Detail-oriented tester with automation experience.",
+    skills: ["JavaScript", "Git"],
+  },
+];

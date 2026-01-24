@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const CandidateController_1 = require("../controllers/CandidateController");
+const CreateCandidateDto_1 = require("../dto/CreateCandidateDto");
+const PaginationDto_1 = require("../dto/PaginationDto");
+const UpdateStatusDto_1 = require("../dto/UpdateStatusDto");
+const rateLimiter_1 = require("../middleware/rateLimiter");
+const validate_1 = require("../middleware/validate");
+const router = (0, express_1.Router)();
+router.get("/", (0, validate_1.validateQuery)(PaginationDto_1.PaginationDto), CandidateController_1.candidateController.getAll);
+router.get("/:id", CandidateController_1.candidateController.getById);
+router.post("/", rateLimiter_1.strictLimiter, (0, validate_1.validateDto)(CreateCandidateDto_1.CreateCandidateDto), CandidateController_1.candidateController.create);
+router.patch("/:id/status", rateLimiter_1.strictLimiter, (0, validate_1.validateDto)(UpdateStatusDto_1.UpdateStatusDto), CandidateController_1.candidateController.updateStatus);
+exports.default = router;

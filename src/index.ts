@@ -20,9 +20,13 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
   : ["http://localhost:5173", "http://localhost:3000"];
 
-logger.info({ allowedOrigins }, "CORS allowed origins");
+logger.info(`CORS allowed origins: ${JSON.stringify(allowedOrigins)}`);
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 
 app.use(
   cors({

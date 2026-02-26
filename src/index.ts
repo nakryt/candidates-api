@@ -52,21 +52,21 @@ app.use(express.json({ limit: "50kb" }));
 app.use(pinoHttp({ logger }));
 
 app.use("/api", apiLimiter);
+app.use("/api", routes);
+app.get("/", (_req, res: Response) => {
+  res.json({ message: "Candidate Management API" });
+});
+app.use(errorHandler);
+
+app.listen(PORT, () => {
+  logger.info({ port: PORT }, "Server started");
+});
 
 AppDataSource.initialize()
-  .then(async () => {
+  .then(() => {
     logger.info("Data Source initialized");
-
-    app.use("/api", routes);
-    app.get("/", (_req, res: Response) => {
-      res.json({ message: "Candidate Management API" });
-    });
-    app.use(errorHandler);
-
-    app.listen(PORT, () => {
-      logger.info({ port: PORT }, "Server started");
-    });
   })
   .catch((err) => {
     logger.error({ err }, "Data Source initialization failed");
+    process.exit(1);
   });

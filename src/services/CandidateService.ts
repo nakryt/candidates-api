@@ -1,18 +1,28 @@
+import { DataSource, In } from "typeorm";
 import { AppDataSource } from "../config/database";
 import { CreateCandidateDto } from "../dto/CreateCandidateDto";
 import { PaginatedResponse } from "../dto/PaginationDto";
+import {
+  CandidateDetailDto,
+  CandidateListDto,
+  toCandidateDetailDto,
+  toCandidateListDto,
+} from "../dto/CandidateResponseDto";
 import { Candidate, CandidateStatus } from "../entities/Candidate";
 import { Skill } from "../entities/Skill";
 import { AppError } from "../middleware/errorHandler";
 
 export class CandidateService {
-  private candidateRepository = AppDataSource.getRepository(Candidate);
-  private skillRepository = AppDataSource.getRepository(Skill);
+  private candidateRepository;
+
+  constructor(dataSource: DataSource = AppDataSource) {
+    this.candidateRepository = dataSource.getRepository(Candidate);
+  }
 
   async getAllCandidates(
     page: number = 1,
     limit: number = 10,
-  ): Promise<PaginatedResponse<Candidate>> {
+  ): Promise<PaginatedResponse<CandidateListDto>> {
     const validPage = Math.max(1, page);
     const validLimit = Math.min(100, Math.max(1, limit));
 
@@ -27,7 +37,7 @@ export class CandidateService {
     const totalPages = Math.ceil(total / validLimit);
 
     return {
-      data,
+      data: data.map(toCandidateListDto),
       total,
       page: validPage,
       limit: validLimit,
@@ -35,7 +45,7 @@ export class CandidateService {
     };
   }
 
-  async getCandidateById(id: number): Promise<Candidate> {
+  async getCandidateById(id: number): Promise<CandidateDetailDto> {
     const candidate = await this.candidateRepository.findOne({
       where: { id },
       relations: ["skills"],
@@ -45,10 +55,10 @@ export class CandidateService {
       throw new AppError("Candidate not found", 404);
     }
 
-    return candidate;
+    return toCandidateDetailDto(candidate);
   }
 
-  async updateStatus(id: number, status: CandidateStatus): Promise<Candidate> {
+  async updateStatus(id: number, status: CandidateStatus): Promise<CandidateDetailDto> {
     // Use transaction to ensure atomicity
     return await AppDataSource.transaction(
       async (transactionalEntityManager) => {
@@ -62,12 +72,13 @@ export class CandidateService {
         }
 
         candidate.status = status;
-        return await transactionalEntityManager.save(Candidate, candidate);
+        const saved = await transactionalEntityManager.save(Candidate, candidate);
+        return toCandidateDetailDto(saved);
       },
     );
   }
 
-  async createCandidate(dto: CreateCandidateDto): Promise<Candidate> {
+  async createCandidate(dto: CreateCandidateDto): Promise<CandidateDetailDto> {
     return await AppDataSource.transaction(
       async (transactionalEntityManager) => {
         const existingEmail = await transactionalEntityManager.findOne(
@@ -97,14 +108,13 @@ export class CandidateService {
         candidate.position = dto.position;
         candidate.email = dto.email;
         candidate.phone = dto.phone;
-        candidate.description = dto.description || "";
+        candidate.description = dto.description ?? "";
         candidate.status = dto.status || CandidateStatus.ACTIVE;
 
         if (dto.skillIds && dto.skillIds?.length > 0) {
-          const skills = await transactionalEntityManager.findByIds(
-            Skill,
-            dto.skillIds,
-          );
+          const skills = await transactionalEntityManager.findBy(Skill, {
+            id: In(dto.skillIds),
+          });
 
           if (skills?.length !== dto.skillIds?.length) {
             throw new AppError("One or more skills not found", 400);
@@ -129,7 +139,7 @@ export class CandidateService {
           throw new AppError("Failed to create candidate", 500);
         }
 
-        return result;
+        return toCandidateDetailDto(result);
       },
     );
   }

@@ -1,6 +1,7 @@
 import { AppDataSource } from "../config/database";
 import { Candidate } from "../entities/Candidate";
 import { Skill } from "../entities/Skill";
+import { logger } from "../utils/logger";
 import { candidatesData, skillsData } from "./seedData";
 
 const seedDatabase = async () => {
@@ -12,11 +13,11 @@ const seedDatabase = async () => {
 
     const existingCandidates = await candidateRepo.count();
     if (existingCandidates > 0) {
-      console.log(`Database already has ${existingCandidates} candidates. Skipping seed.`);
+      logger.info({ existingCandidates }, "Database already has candidates. Skipping seed.");
       process.exit(0);
     }
 
-    console.log("Database is empty. Starting seed...");
+    logger.info("Database is empty. Starting seed...");
 
     const skills: Skill[] = [];
     for (const skillName of skillsData) {
@@ -32,7 +33,7 @@ const seedDatabase = async () => {
     for (const data of candidatesData) {
       const existing = await candidateRepo.findOne({ where: { email: data.email } });
       if (existing) {
-        console.log(`Candidate ${data.email} already exists. Skipping.`);
+        logger.info({ email: data.email }, "Candidate already exists. Skipping.");
         continue;
       }
 
@@ -48,10 +49,10 @@ const seedDatabase = async () => {
       await candidateRepo.save(candidate);
     }
 
-    console.log("Seeding completed!");
+    logger.info("Seeding completed!");
     process.exit(0);
   } catch (error) {
-    console.error("Error during seeding:", error);
+    logger.error({ err: error }, "Error during seeding");
     process.exit(1);
   }
 };

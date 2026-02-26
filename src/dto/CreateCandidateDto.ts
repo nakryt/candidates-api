@@ -3,10 +3,12 @@ import {
   IsArray,
   IsEmail,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
   Length,
+  Min,
 } from "class-validator";
 import { CandidateStatus } from "../entities/Candidate";
 
@@ -42,5 +44,7 @@ export class CreateCandidateDto {
   @IsOptional()
   @IsArray({ message: "Skills must be an array" })
   @ArrayMinSize(0, { message: "Skills array cannot be empty if provided" })
+  @IsInt({ each: true, message: "Each skill ID must be an integer" })
+  @Min(1, { each: true, message: "Each skill ID must be a positive integer" })
   skillIds?: number[];
 }

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { candidateService } from "../services/CandidateService";
 
 export class CandidateController {
-  async getAll(req: Request, res: Response, next: NextFunction) {
+  async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { page = 1, limit = 10 } = req.query as {
         page?: number;
@@ -19,22 +19,30 @@ export class CandidateController {
     }
   }
 
-  async getById(req: Request, res: Response, next: NextFunction) {
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
-      const candidate = await candidateService.getCandidateById(Number(id));
+      const id = parseInt(String(req.params.id), 10);
+      if (!Number.isInteger(id) || id <= 0) {
+        res.status(400).json({ status: "error", statusCode: 400, message: "Invalid candidate ID" });
+        return;
+      }
+      const candidate = await candidateService.getCandidateById(id);
       res.json(candidate);
     } catch (error) {
       next(error);
     }
   }
 
-  async updateStatus(req: Request, res: Response, next: NextFunction) {
+  async updateStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const id = parseInt(String(req.params.id), 10);
+      if (!Number.isInteger(id) || id <= 0) {
+        res.status(400).json({ status: "error", statusCode: 400, message: "Invalid candidate ID" });
+        return;
+      }
       const { status } = req.body;
       const updatedCandidate = await candidateService.updateStatus(
-        Number(id),
+        id,
         status,
       );
       res.json(updatedCandidate);
@@ -43,7 +51,7 @@ export class CandidateController {
     }
   }
 
-  async create(req: Request, res: Response, next: NextFunction) {
+  async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const newCandidate = await candidateService.createCandidate(req.body);
       res.status(201).json(newCandidate);

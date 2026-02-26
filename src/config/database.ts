@@ -9,7 +9,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 const getDataSourceOptions = (): DataSourceOptions => {
   const baseConfig = {
     type: "postgres" as const,
-    synchronize: isDevelopment,
+    synchronize: false,
     logging: isDevelopment ? true : false,
     entities: [__dirname + "/../entities/*.{ts,js}"],
     migrations: [__dirname + "/../migrations/*.{ts,js}"],
@@ -22,7 +22,10 @@ const getDataSourceOptions = (): DataSourceOptions => {
     return {
       ...baseConfig,
       url: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      ssl: {
+        rejectUnauthorized: true,
+        ca: process.env.DB_SSL_CA ?? undefined,
+      },
     };
   }
 

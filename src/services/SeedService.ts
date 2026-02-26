@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 import { Candidate } from "../entities/Candidate";
 import { Skill } from "../entities/Skill";
 import { candidatesData, skillsData } from "../seeds/seedData";
+import { logger } from "../utils/logger";
 
 export class SeedService {
   static async seed(dataSource: DataSource) {
@@ -11,11 +12,11 @@ export class SeedService {
 
       const candidateCount = await candidateRepo.count();
       if (candidateCount > 0) {
-        console.log("Database already has data, skipping seed.");
+        logger.info("Database already has data, skipping seed.");
         return;
       }
 
-      console.log("Starting database seed...");
+      logger.info("Starting database seed...");
 
       const skills: Skill[] = [];
       for (const skillName of skillsData) {
@@ -42,9 +43,9 @@ export class SeedService {
         await candidateRepo.save(candidate);
       }
 
-      console.log("Seeding completed successfully!");
+      logger.info("Seeding completed successfully!");
     } catch (error) {
-      console.error("Error during seeding:", error);
+      logger.error({ err: error }, "Error during seeding");
     }
   }
 }

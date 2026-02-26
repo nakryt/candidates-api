@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { logger } from "../utils/logger";
 
 export class AppError extends Error {
   constructor(
@@ -14,12 +15,16 @@ export const errorHandler = (
   err: Error | AppError,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
-  console.error(err.stack);
+  const isOperational = err instanceof AppError;
+  const statusCode = isOperational ? err.statusCode : 500;
 
-  const statusCode = err instanceof AppError ? err.statusCode : 500;
-  const message = err.message || "Internal Server Error";
+  // Always log full error server-side
+  logger.error({ err, path: req.path, method: req.method }, "Request error");
+
+  // Only expose controlled AppError messages; mask everything else
+  const message = isOperational ? err.message : "Internal Server Error";
 
   res.status(statusCode).json({
     status: "error",

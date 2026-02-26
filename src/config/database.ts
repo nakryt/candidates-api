@@ -22,10 +22,9 @@ const getDataSourceOptions = (): DataSourceOptions => {
     return {
       ...baseConfig,
       url: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: true,
-        ca: process.env.DB_SSL_CA ?? undefined,
-      },
+      ssl: process.env.DB_SSL_CA
+        ? { rejectUnauthorized: true, ca: process.env.DB_SSL_CA }
+        : { rejectUnauthorized: false },
     };
   }
 
